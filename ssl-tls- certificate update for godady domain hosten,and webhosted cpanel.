@@ -1,0 +1,59 @@
+Solus.ie SSL/TLC certificate update:
+
+There are a few steps that are important at the time of SSL/TLS certificate renewal of Solus.ie.
+
+Step#1
+ Devs/client give us .cert-file, ca-bundle, and a private key file,  private-key which extension is filename.pfx.
+
+
+We will take this file and open in any Linux server with below mentioned command which generates a private key from this file.
+
+On executing the below command it will ask  password given by dev’s/client,  in this case password is:   MagentoRolus21
+
+# openssl pkcs12 -in magento.pfx -nocerts -out privatekey.pem -nodes
+
+
+
+# ls -l   =   it will show private-key.pem file,  
+
+# Go to cpanel —->  manage ssl certificates   click on domain which is showing certificate is expired , click update —> give domain name—>  paste .cert file ,   —-> paste private key , and click on auto fill,     if key is invalid there should be popup invalid indicator will sow, you should have to update valid key.
+
+Now you can verify website url in browser if it is going with ssl or not.
+
+Additional steps::
+
+In case of key invalid you can verify privatekey format, certificate format  key is valid or not by executing below command:
+
+
+# openssl rsa -in privatekey.pem -check
+
+To verify the certificate validity:
+
+# openssl x509 -in certificate.pem -text -noout
+
+Match the Private key and certificate they are associated with each other or not.
+
+Fist we will generate public key from private key to match it with certificate
+
+# openssl rsa -in privatekey.pem -pubout -outform pem -out pubkey.pem
+
+Now we will compare the public key with the certificate.pem in case of any ambiguity or mismatch by executing the below command. 
+
+I
+
+# openssl x509 -pubkey -noout -in certificate.pem | openssl rsa -pubin -outform pem | diff - pubkey.pem
+
+
+If key or cert is invalid it will thow error, if it is accurate it will throw no error.
+
+
+
+
+
+
+
+
+
+
+
+
