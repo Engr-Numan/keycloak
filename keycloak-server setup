@@ -1,0 +1,159 @@
+How to Setup KeyKcloak server on Ubuntu
+
+# sudo apt-get update
+
+# sudo apt install openjdk-17-jdk
+
+# java -version 
+# cd /opt/
+
+# sudo wget https://github.com/keycloak/keycloak/releases/download/19.0.2/keycloak-19.0.2.tar.gz
+
+# sudo tar -xvzf keycloak-19.0.2.tar.gz
+
+# cd  keycloak-19.0.2
+# sudo bin/kc.sh start-dev
+
+you should be able to access the server using ip address at port 8080 http://ip:8080
+But, we didn’t have the admin credentials yet set. You will get the home screen but the following message
+set the environment variables KEYCLOAK_ADMIN and KEYCLOAK_ADMIN_PASSWORD before starting the server. Press ctr + c to stop the service and then configure the admin user.
+We will set the environment variable by typing KC strings at start and above comamnds will be typed as below
+# bin/kc.sh build
+# export KEYCLOAK_ADMIN=admin
+# export KEYCLOAK_ADMIN_PASSWORD=admin
+
+To see the environment variables, you will notice above two lines are appearning
+# printenv
+
+# sudo bin/kc.sh start-dev
+
+
+Now you will see error messages, ssl required, 
+So you have to setup ssl and nginx reverse proxy. And add some headers…
+You should have ssl certificates and domain,   and route ssl certificates, to nginx conf.
+E.g 
+# /home/ubuntu/
+# mkdir ssl
+# cd ssl 
+# place   ssl certificates here,  
+And use same path in the nginx.confi file..
+
+
+
+# sudo apt install nginx 
+# sudo vim /et	c/nginx/sites-available/keycloak
+
+
+
+
+server
+{
+    listen 80;
+    return 301 https://$host$request_uri;
+}
+
+
+server
+
+{
+
+listen   443 ssl;
+
+
+
+#ssl    on;
+
+
+ssl_certificate    /home/ubuntu/ssl/STAR_rolustech_com.crt;
+ssl_certificate_key    /home/ubuntu/ssl/STAR_rolustech_com.key;
+
+server_name keycloaktest.rolustech.com;
+access_log /var/log/nginx/keycloak.access.log;
+error_log /var/log/nginx/keycloak.error.log;
+
+
+proxy_set_header X-Forwarded-For $host;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection ‘upgrade’;
+proxy_set_header Host $host;
+
+
+
+
+location / {
+                    proxy_pass http://127.0.0.1:8080;
+                   # proxy_pass http://54.210.182.206:8080;
+                    proxy_set_header Host $host;
+                    proxy_redirect off;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto $scheme;
+Wq!
+
+Creates symlink by using below command, it reflects change into the sites-enabled.
+# sudo ln -s /etc/nginx/sites-available/keyclaok /etc/nginx/sites-enabled/
+# sudo nginx -t
+# sudo systemctl  reload nginx
+#  sudo systemctl  restart  nginx
+
+
+Start the keycloak again, 
+
+# cd /opt/keycloak-19*
+# /bin/kc.sh start-dev
+
+If not worked url not loadin the webpage.
+Then again go to the keycloak.conf file   
+# vim /opt/keycloak/conf/keycloak.conf
+
+proxy=edge
+Wq!
+Now Start , it will load the page.
+# bin/kc.sh  start-dev
+
+
+Paste the URL in the browser,  
+And explore the things, 
+Especially go to the admin console and click it,   because admin console some times not loading and , it is the error mostly people faced, on the internet,   
+Give credentials 
+Username: Admin , password:  admin
+
+If credentials not works, /
+
+Go again in the 
+#vim /opt/keyclok/conf/keycloak.conf
+
+Add users here, 
+
+KEYCLOAK_ADMIN=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+proxy=edge
+
+
+
+
+
+
+# s -s /etc/ngin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
