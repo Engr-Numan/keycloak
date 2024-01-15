@@ -135,7 +135,54 @@ proxy=edge
 
 
 
-# s -s /etc/ngin
+Requirement changed.  Client removed the nginx proxy and ssl cert, he used AWS Certificate manager for ssl and use  Application Loadbalancer  remove nginx proxy. For that we have to again setup but here some changes required.
+
+Below four lines should be added in the keycloak configuration file. I have installed on latest keycloak 23. Version.       
+
+
+
+# vim /opt/keycloak/conf/keycloak.conf
+
+
+KEYCLOAK_ADMIN=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+
+hostname-url=https://sso.greencultured.co/
+hostname-admin-url=https://sso.greencultured.co/
+
+wq!
+
+
+
+Now to create a service  systemctl to stop ,start, restart 
+
+# vi /etc/systemd/system/keycloak.service
+
+
+
+[Unit]
+Description=KeyCloak Server
+After=network.target
+StartLimitIntervalSec=0
+
+
+[Service]
+Type=simple
+ExecStart=/opt/keycloak-23.0.3/bin/kc.sh start-dev
+
+Restart=always
+REstartSec=1
+
+
+
+
+[Install]
+WantedBy=multi-user.target
+Wq!
+
+# systemctl enable keycloak.service
+# systemctl start keycloak.service
+# systemctl status keycloak.service
 
 
 
